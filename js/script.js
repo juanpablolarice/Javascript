@@ -45,11 +45,6 @@ const aulas = [
     { "id":2 , "anio": 1, "turno": "Tarde", "division": "B"}
 ];
 
-const asistencias = [
-    { "id_alumno": 1, "id_aula": 1, "fecha": new Date().toLocaleDateString(), "asistencia": "Ausente"},
-    { "id_alumno": 3, "id_aula": 1, "fecha": new Date().toLocaleDateString(), "asistencia": "Ausente"},
-    { "id_alumno": 5, "id_aula": 1, "fecha": new Date().toLocaleDateString(), "asistencia": "Ausente"}
-];
 
 const aulaAlumnos = [
     {"id_aula":1,"id_alumno":1},
@@ -84,15 +79,25 @@ const aulaAlumnos = [
     {"id_aula":2,"id_alumno":30}
 ];
 
-// class Asistencia {
-//     constructor (id_alumno, id_aula, asistencia, fecha) {
-//         // this.id = id;
-//         this.id_alumno = id_alumno;
-//         this.id_aula = id_aula;
-//         this.asistencia = asistencia;
-//         this.fecha = fecha;
-//     }
-// }
+// const hoy = new Date();
+//     aux = hoy.getFullYear() + "-" + (hoy.getMonth() + 1 ) + "-" + hoy.getDate();
+//     console.log("Aux: " + aux);
+let asistencias = JSON.parse(window.localStorage.getItem('asistencias')) || [];
+    // asistencias = [{ "id_alumno": 1, "id_aula": 1, "fecha": "2023-01-09", "asistencia": "Ausente"}];
+//     { "id_alumno": 1, "id_aula": 1, "fecha": aux, "asistencia": "Ausente"},
+//     { "id_alumno": 3, "id_aula": 1, "fecha": aux, "asistencia": "Ausente"},
+//     { "id_alumno": 5, "id_aula": 1, "fecha": aux, "asistencia": "Ausente"}
+// ];
+
+class Asistencia {
+    constructor (id_alumno, id_aula, asistencia, fecha) {
+        // this.id = id;
+        this.id_alumno = id_alumno;
+        this.id_aula = id_aula;
+        this.asistencia = asistencia;
+        this.fecha = fecha;
+    }
+}
 
 // alumnos.forEach((alumno) => {
 //     asistencias.push(new Asistencia(alumno.id, "Ausente", new Date().toLocaleDateString()));
@@ -116,11 +121,11 @@ function recuperarAlumnos(storage){
 }
 
 const bodyAlumnos = document.getElementById("bodyAlumnos");
-    selAulas = document.getElementById("selAulas");
-    diaAsistencia = document.getElementById("diaAsistencia");
-    btnCargar = document.getElementById("btnCargar");
+const selAulas = document.getElementById("selAulas");
+const diaAsistencia = document.getElementById("diaAsistencia");
+const btnCargar = document.getElementById("btnCargar");
 
-    diaAsistencia.value =  new Date().toLocaleDateString();
+    // diaAsistencia.value =  new Date().toLocaleDateString();
 
 aulas.forEach((aula) => {
     selAulas.innerHTML += `<option value="${aula.id}">${aula.anio}° ${aula.division} - ${aula.turno}</option>`
@@ -139,7 +144,7 @@ aulas.forEach((aula) => {
 //     </tr>`;
 // });
 
-const btnPresentes = document.querySelectorAll(".btnPresente");
+let btnPresentes = document.querySelectorAll(".btnPresente");
 // console.log(btnPresente);
 function buscarAlumno(id){
     let alumnos = JSON.parse(window.localStorage.getItem('alumnos'));
@@ -190,46 +195,113 @@ window.localStorage.setItem('aulaAlumnos', JSON.stringify(aulaAlumnos));
 //     });
 // });
 
+diaAsistencia.addEventListener("change", function() {
+    var fecha = this.value;
+    // var dateEntered = new Date(fecha);
+    console.log(fecha); //e.g. 2015-11-13
+    // console.log(dateEntered); //e.g. Fri Nov 13 2015 00:00:00 GMT+0000 (GMT Standard Time)
+});
+
 btnCargar.addEventListener('click', (e)=>{
     e.preventDefault();
-    bodyAlumnos.innerHTML = "";
+    let x = new Date(diaAsistencia.value);
+    console.log(diaAsistencia.value);
+    // console.log(x.toLocaleDateString());
+    console.log("Input valor: " + x.getFullYear() + "-" + (x.getMonth() + 1 ) + "-" + x.getDate());
+    bodyAlumnos.innerHTML = "";    
     let aulaAlumno = JSON.parse(window.localStorage.getItem('aulaAlumnos'));
-    let alumnosFiltrado = aulaAlumno.filter(alumno => alumno.id_aula === parseInt(selAulas.value));
+    let alumnosFiltrado = aulaAlumno.filter(alumno => alumno.id_aula === parseInt(selAulas.value));    
     alumnosFiltrado.forEach((alum) => {
-        console.log(alum.id_alumno);
+        // console.log(alum.id_alumno);
         let alumno = buscarAlumno(alum.id_alumno);
         let asistenciaAlumno = asistencias.filter(asistencia => asistencia.id_alumno === parseInt(alum.id_alumno));
-        console.log(asistenciaAlumno);
+        // console.log(asistenciaAlumno);
         // console.log(new Date().toLocaleDateString());
         // if(asistenciaAlumno.fecha == new Date().toLocaleDateString()){
         //     console.log(asistenciaAlumno);
         // }else{
         let x = new Date(diaAsistencia.value);
-        console.log("diaAsistencia: " + x);
-            let asistenciaFecha = asistenciaAlumno.find(asistencia => asistencia.fecha === diaAsistencia.value);
-            console.log(asistenciaFecha);
+        // console.log("diaAsistencia: " + x);
+        let asistenciaFecha = asistenciaAlumno.find(asistencia => asistencia.id_alumno === alumno.id && asistencia.id_aula === parseInt(selAulas.value) && asistencia.fecha === diaAsistencia.value);
+        // console.log(asistenciaFecha);
         // }
-        console.log(alumno);
+        // console.log(alumno);
         // TRAER LOS ALUMNOS CON EL ID
         bodyAlumnos.innerHTML += `<tr>
             <th scope="row">${alumno.id}</th>
             <td>${alumno.nombre}</td>
             <td>${alumno.apellido}</td>
             <td>${alumno.documento}</td>
-            <td>-</td>
-            <td><a href="#" class="btnPresente px-2" title="Presente" data-alumnoid="${alumno.id}"><i class="bi bi-check-circle-fill text-success"></i></a><a href="" class="btnAusente px-2" title="Ausente"><i class="bi bi-x-circle-fill text-danger"></i></a></td>
+            <td class="text-center" id="id_asistencia${alumno.id}">${asistenciaFecha?.asistencia || "-"}</td>
+            <td>
+                <a href="#" class="btnPresente px-2" title="Presente" data-alumnoid="${alumno.id}"><i class="bi bi-check-circle-fill text-success"></i></a>
+                <a href="" class="btnAusente px-2" title="Ausente" data-alumnoid="${alumno.id}"><i class="bi bi-x-circle-fill text-danger"></i></a>
+            </td>
         </tr>`;
+    });
+    
+    btnPresentes = document.querySelectorAll(".btnPresente");    
+    // AGREGO EVENTOS A LOS BOTONES DE PRESENTE
+    btnPresentes.forEach((item) => {
+        item.addEventListener('click', (e)=>{
+            e.preventDefault();
+            // const btnPresentes = document.querySelectorAll(".btnPresente");
+            let alumno = buscarAlumno(item.getAttribute('data-alumnoid'));
+            // console.table(alumno);
+            let asistenciaTexto = document.getElementById('id_asistencia' + item.getAttribute('data-alumnoid'));
+            asistenciaTexto.innerHTML = 'Presente';
+            asistencias = JSON.parse(window.localStorage.getItem('asistencias')) || [];
+            asistenciaAlumno = asistencias.filter(asistencia => asistencia.id_alumno === parseInt(item.getAttribute('data-alumnoid')) && asistencia.id_aula === parseInt(selAulas.value) && asistencia.fecha === diaAsistencia.value);
+            console.log("Dia asistencia: " + diaAsistencia.value);
+            console.table(asistenciaAlumno.length);
+            if(asistenciaAlumno.length > 0){
+                console.log("IF");
+                asistenciaAlumno.forEach((item) => {
+                    console.table(item);
+                    item.asistencia = "Presente";
+                    // ACTUALIZO EL LOCALSTORAGE
+                    window.localStorage.setItem('asistencias', JSON.stringify(asistencias));
+                });
+            }else{
+                console.log("ELSE");
+                asistencias.push(new Asistencia(parseInt(item.getAttribute('data-alumnoid')), parseInt(selAulas.value), "Presente", diaAsistencia.value));
+                window.localStorage.setItem('asistencias', JSON.stringify(asistencias));
+            }
+            // console.log(asistenciaAlumno || "Vacio");
+        });
+    });
+
+    btnAusentes = document.querySelectorAll(".btnAusente");    
+    // AGREGO EVENTOS A LOS BOTONES DE AUSENTE
+    btnAusentes.forEach((item) => {
+        item.addEventListener('click', (e)=>{
+            e.preventDefault();
+            
+            let alumno = buscarAlumno(item.getAttribute('data-alumnoid'));
+            // console.table(alumno);
+            let asistenciaTexto = document.getElementById('id_asistencia' + item.getAttribute('data-alumnoid'));
+            asistenciaTexto.innerHTML = 'Ausente';
+            asistencias = JSON.parse(window.localStorage.getItem('asistencias')) || [];
+            asistenciaAlumno = asistencias.filter(asistencia => asistencia.id_alumno === parseInt(item.getAttribute('data-alumnoid')) && asistencia.id_aula === parseInt(selAulas.value) && asistencia.fecha === diaAsistencia.value);
+            console.log("Dia asistencia: " + diaAsistencia.value);
+            console.table(asistenciaAlumno.length);
+            if(asistenciaAlumno.length > 0){
+                console.log("IF");
+                asistenciaAlumno.forEach((item) => {
+                    console.table(item);
+                    item.asistencia = "Aussente";
+                    // ACTUALIZO EL LOCALSTORAGE
+                    window.localStorage.setItem('asistencias', JSON.stringify(asistencias));
+                });
+            }else{
+                console.log("ELSE");
+                asistencias.push(new Asistencia(parseInt(item.getAttribute('data-alumnoid')), parseInt(selAulas.value), "Ausente", diaAsistencia.value));
+                window.localStorage.setItem('asistencias', JSON.stringify(asistencias));
+            }
+        });
     });
 });
 
-// console.log(window.localStorage.getItem('alumnos'));
-btnPresentes.forEach((item) => {
-    item.addEventListener('click', (e)=>{
-        e.preventDefault();
-        let alumno = buscarAlumno(item.getAttribute('data-alumnoid'));
-        console.log(alumno);
-    });
-});
 
 
 function limpiar(element){

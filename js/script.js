@@ -36,9 +36,11 @@ let asistencias = JSON.parse(localStorage.getItem('asistencias')) || [];
 localStorage.setItem('aulas', JSON.stringify(aulas));
 localStorage.setItem('asistencias', JSON.stringify(asistencias));
 
-aulas.forEach((aula) => {
-    selAulas.innerHTML += `<option value="${aula.id}">${aula.curso}</option>`
-});
+fetch('cursos.json')
+    .then(res => res.json())
+    .then(data => data.forEach((curso) => {
+        selAulas.innerHTML += `<option value="${curso.id}">${curso.curso}</option>`
+    }));
 
 diaAsistencia.addEventListener("change", function() {
     var fecha = this.value;

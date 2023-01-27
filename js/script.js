@@ -27,6 +27,7 @@ const bodyAlumnos = document.getElementById("bodyAlumnos");
 const selAulas = document.getElementById("selAulas");
 const diaAsistencia = document.getElementById("diaAsistencia");
 const btnCargar = document.getElementById("btnCargar");
+const modalAlumno = new bootstrap.Modal(document.getElementById('modalAlumno'));
 let btnPresentes = document.querySelectorAll(".btnPresente");
 let asistencias = JSON.parse(localStorage.getItem('asistencias')) || [];
 
@@ -41,7 +42,6 @@ aulas.forEach((aula) => {
 
 diaAsistencia.addEventListener("change", function() {
     var fecha = this.value;
-    console.log(fecha);
 });
 
 const cargarAlumnos = async () => {
@@ -70,7 +70,7 @@ const cargarAlumnos = async () => {
                 <td class="text-center">
                 <a href="#" class="btnPresente px-2" title="Presente" data-alumnoid="${user[0].id}"><i class="bi bi-check-circle-fill text-success"></i></a>
                 <a href="#" class="btnAusente px-2" title="Ausente" data-alumnoid="${user[0].id}"><i class="bi bi-x-circle-fill text-danger"></i></a>
-                <a href="#" class="btnAvatar px-2" title="Ver alumno" data-alumnoid="${user[0].id}"><i class="bi bi-search text-info"></i></a>
+                <a href="#" class="btnAlumno px-2" title="Ver alumno" data-alumnoid="${user[0].id}"><i class="bi bi-search text-info"></i></a>
                 </td>
                 </tr>`;
             });
@@ -94,6 +94,34 @@ const cargarAlumnos = async () => {
             item.addEventListener('click', (e)=>{
                 e.preventDefault();
                 let alumno = guardarAsistencia(item.getAttribute('data-alumnoid'), "Ausente");
+            });
+        });
+    });
+
+    cargarBtn('.btnAlumno').then((elm) => {        
+        btnAlumnos = document.querySelectorAll(".btnAlumno");    
+        // AGREGO EVENTOS A LOS BOTONES DE LA FICHA DEL ALUMNO
+        btnAlumnos.forEach((item) => {
+            item.addEventListener('click', (e)=>{
+                e.preventDefault();
+                
+                const nombre = document.querySelector("#nombreAlumno");
+                const imagen = document.querySelector("#imagenAlumno");
+                const fechaNac = document.querySelector("#fechaNacAlumno");
+                const email = document.querySelector("#emailAlumno");
+                const telefono = document.querySelector("#telefonoAlumno");
+
+                fetch(`https://dummyjson.com/users/${item.getAttribute('data-alumnoid')}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data);
+                        nombre.innerHTML = `${data.firstName} ${data.lastName}`;
+                        imagen.innerHTML = `<img src="${data.image}" class="img-fluid">`;
+                        fechaNac.innerHTML = `${data.birthDate}`;
+                        email.innerHTML = `${data.email}`;
+                        telefono.innerHTML = `${data.phone}`;
+                    });
+                modalAlumno.show();
             });
         });
     });
@@ -150,9 +178,9 @@ function guardarAsistencia(id, texto){
         .then(res => res.json())
         .then(data => {
             let asistenciaTexto = document.getElementById('id_asistencia' + id);
+
             asistenciaTexto.innerHTML = texto;
             asistencias = JSON.parse(localStorage.getItem('asistencias')) || [];
-            console.log(asistencias);
             asistenciaAlumno = asistencias.filter(asistencia => asistencia.id_alumno === parseInt(id) && asistencia.id_aula === parseInt(selAulas.value) && asistencia.fecha === diaAsistencia.value);
             if(asistenciaAlumno.length > 0){
                 asistenciaAlumno.forEach((item) => {

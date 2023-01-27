@@ -105,10 +105,15 @@ const cargarAlumnos = async () => {
                 const email = document.querySelector("#emailAlumno");
                 const telefono = document.querySelector("#telefonoAlumno");
 
+                nombre.innerHTML = "";
+                imagen.innerHTML = "";
+                fechaNac.innerHTML = "";
+                email.innerHTML = "";
+                telefono.innerHTML = "";
+
                 fetch(`https://dummyjson.com/users/${item.getAttribute('data-alumnoid')}`)
                     .then(res => res.json())
                     .then(data => {
-                        console.log(data);
                         nombre.innerHTML = `${data.firstName} ${data.lastName}`;
                         imagen.innerHTML = `<img src="${data.image}" class="img-fluid">`;
                         fechaNac.innerHTML = `${data.birthDate}`;

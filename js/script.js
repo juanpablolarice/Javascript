@@ -15,13 +15,6 @@ class Asistencia {
         this.fecha = fecha;
     }
 }
-
-const aulas = [
-    { "id":1 , "curso": "Desarrollo Web"},
-    { "id":2 , "curso": "Javascript"},
-    { "id":3 , "curso": "React"},
-    { "id":4 , "curso": "Back End"}
-];
     
 const bodyAlumnos = document.getElementById("bodyAlumnos");
 const selAulas = document.getElementById("selAulas");
@@ -33,7 +26,6 @@ let asistencias = JSON.parse(localStorage.getItem('asistencias')) || [];
 
 
 // LOCAL STORAGE
-localStorage.setItem('aulas', JSON.stringify(aulas));
 localStorage.setItem('asistencias', JSON.stringify(asistencias));
 
 fetch('cursos.json')
